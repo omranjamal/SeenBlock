@@ -6,22 +6,26 @@
 // @include        https://www.facebook.com/*
 // @version        1
 // @grant          none
-// @run-at         document-end
+// @run-at         document-start
 // @downloadURL    https://raw.githubusercontent.com/Hedronium/SeenBlock/master/SeenBlock.user.js
 // ==/UserScript==
 
-var internal = XMLHttpRequest.prototype.open;
+var internal_ajax_method_call = XMLHttpRequest.prototype.open;
 
-XMLHttpRequest.prototype.open = function () {
-  var url = arguments[1];
-  var pieces = url.split('/');
-  var last = pieces[pieces.length - 1];
-  var endpoint = last.substr(0, 22);
+console.log('SeenBlock running.');
 
-  if (endpoint === 'change_read_status.php') {
-    console.log('Blocked request to ' + url);
-    return;
+XMLHttpRequest.prototype.open = function (method, url) {
+  if (typeof url === 'string') {
+    var pieces = url.split('/');
+
+    var last = pieces[pieces.length - 1];
+    var endpoint = last.substr(0, 22);
+
+    if (endpoint == 'change_read_status.php') {
+      console.log('Blocked request to ' + url);
+      return;
+    }
   }
-
-  internal.apply(this, arguments);
-}
+  
+  return internal_ajax_method_call.apply(this, arguments);
+};
